@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enlarged Universe Layers</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .universe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .layer {
+      width: 100vw;
+      height: 100vh;
+      cursor: move;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .dot {
+      background-color: white; /* Set dot color to white */
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    .bottom-layer {
+      background-color: black; /* Set background color of the bottom layer to black */
+      z-index: 1; /* Ensure the bottom layer is below the top layer */
+    }
+
+    .top-layer {
+        transform: scale(1.05);
+      z-index: 2; /* Ensure the top layer is on top of the bottom layer */
+    }
+    .top-layer .dot{
+        background-color: rgb(20, 200, 200);
+    }
+  </style>
+</head>
+<body>
+  <div class="universe">
+    <div class="layer bottom-layer" id="bottomLayer"></div>
+    <div class="layer top-layer" id="topLayer"></div>
+  </div>
+
+  <script>
+    const bottomLayer = document.getElementById('bottomLayer');
+    const topLayer = document.getElementById('topLayer');
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    createDots(bottomLayer, 60); // Triple the number of dots
+    copyDotsToTopLayer(bottomLayer, topLayer);
+
+    topLayer.addEventListener('mousedown', startDragging);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDragging);
+
+    function createDots(layer, dotCount) {
+      for (let i = 0; i < dotCount; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        const size = Math.random() * 20 + 10; // Random size between 10 and 30 pixels
+        const left = Math.random() * (window.innerWidth - size);
+        const top = Math.random() * (window.innerHeight - size);
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.left = `${left}px`;
+        dot.style.top = `${top}px`;
+        layer.appendChild(dot);
+      }
+    }
+
+    function copyDotsToTopLayer(bottomLayer, topLayer) {
+      const bottomDots = bottomLayer.getElementsByClassName('dot');
+      for (const bottomDot of bottomDots) {
+        const topDot = bottomDot.cloneNode(true);
+        topLayer.appendChild(topDot);
+      }
+    }
+
+    function startDragging(e) {
+      isDragging = true;
+      offsetX = e.clientX - topLayer.getBoundingClientRect().left;
+      offsetY = e.clientY - topLayer.getBoundingClientRect().top;
+    }
+
+    function drag(e) {
+      if (!isDragging) return;
+
+      const x = e.clientX * 1.05 - offsetX;
+      const y = e.clientY * 1.05 - offsetY;
+
+      topLayer.style.left = `${x}px`;
+      topLayer.style.top = `${y}px`;
+    }
+
+    function stopDragging() {
+      isDragging = false;
+    }
+  </script>
+</body>
+</html>
